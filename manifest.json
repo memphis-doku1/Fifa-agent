@@ -1,0 +1,20 @@
+{
+  "name": "Saber Aballagh - FIFA Agent Dashboard",
+  "short_name": "FIFA Agent",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b131f",
+  "theme_color": "#132235",
+  "icons": [
+    {
+      "src": "Logo Fifa.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "Logo Fifa.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
