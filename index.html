@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saber Aballagh - FIFA Agent Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b131f;
+            --card-bg: #132235;
+            --card-border: #1e3a5f;
+            --accent-gold: #e5b869;
+            --accent-green: #10b981;
+            --text-white: #ffffff;
+            --text-muted: #8b9bb4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            padding-bottom: 80px;
+        }
+
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Vues Onglets */
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* En-tête Profil */
+        .profile-header {
+            background: linear-gradient(135deg, #132235 0%, #0d1928 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1e3a5f, #0f233d);
+            border: 2px solid var(--accent-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .profile-info h1 {
+            font-size: 18px;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .profile-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .profile-info .id-tag {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        /* Badge FIFA */
+        .accreditations {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .badge-card {
+            background: rgba(15, 35, 61, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .badge-card svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .badge-card-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .badge-card-info .title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-white);
+        }
+
+        .badge-card-info .subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ================= NOUVEAU : NOTIFICATION ================= */
+        .notification-card {
+            background: linear-gradient(135deg, rgba(229, 184, 105, 0.1) 0%, rgba(19, 34, 53, 0.8) 100%);
+            border: 1px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(229, 184, 105, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--accent-gold);
+        }
+
+        .notif-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(229, 184, 105, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .bell-shake {
+            animation: shake 2.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(15deg); }
+            20% { transform: rotate(-15deg); }
+            30% { transform: rotate(15deg); }
+            40% { transform: rotate(-15deg); }
+            50% { transform: rotate(0); }
+            100% { transform: rotate(0); }
+        }
+
+        .notif-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notif-player {
+            color: var(--text-white);
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notif-details {
+            list-style: none;
+        }
+
+        .notif-details li {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .notif-details li strong {
+            color: #d1d5db;
+        }
+
+        .notif-details i {
+            color: var(--accent-gold);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        /* ================= FIN NOTIFICATION ================= */
+
+        /* Stats Bar */
+        .stats-bar {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* Titres & Recherche */
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 16px 12px 42px;
+            color: var(--text-white);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Player Card */
+        .player-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .player-identity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #1e3a5f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-size: 14px;
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .status-badge {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Timeline Transfert */
+        .transfer-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transfer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .transfer-path {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d1d5db;
+        }
+
+        .transfer-path i {
+            color: var(--accent-gold);
+            font-size: 10px;
+        }
+
+        .transfer-date {
+            color: var(--text-muted);
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* Page Joueurs & Transferts Styles */
+        .data-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .card-header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .club-tag {
+            background: rgba(229, 184, 105, 0.15);
+            color: var(--accent-gold);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .transfer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+        }
+
+        .transfer-team {
+            font-size: 13px;
+            color: #d1d5db;
+        }
+
+        .transfer-season {
+            font-size: 11px;
+            color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Profil Info */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .info-item span:first-child {
+            color: var(--text-muted);
+        }
+
+        .info-item span:last-child {
+            font-weight: 600;
+        }
+
+        /* Navigation Bas */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: #0d1928;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 480px;
+            margin: 0 auto;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10px;
+            background: none;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--accent-green);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+
+        <!-- ================= PAGE 1: DASHBOARD ================= -->
+        <div id="dashboardPage" class="page-view active">
+            
+            <!-- En-tête Agent -->
+            <div class="profile-header">
+                <div class="avatar">SA</div>
+                <div class="profile-info">
+                    <h1>Saber Aballagh</h1>
+                    <p>Nationalité : <span class="id-tag">Marocain</span></p>
+                    <p>ID Licence : <span class="id-tag">Ma32009</span></p>
+                </div>
+            </div>
+
+            <!-- Badge FIFA -->
+            <div class="accreditations">
+                <div class="badge-card">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="12" fill="#0284c7"/>
+                        <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="900" font-family="sans-serif">FIFA</text>
+                        <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" fill="#e5b869" font-size="10" font-weight="bold" font-family="sans-serif">AGENT</text>
+                    </svg>
+                    <div class="badge-card-info">
+                        <span class="title">FIFA Football Agent</span>
+                        <span class="subtitle">Licencié & Accrédité Officiel</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= NOTIFICATION EN COURS ================= -->
+            <div class="notification-card">
+                <div class="notif-header">
+                    <i class="fa-solid fa-bell bell-shake"></i>
+                    <span>Négociation en cours</span>
+                </div>
+                <div class="notif-body">
+                    <div class="notif-player">
+                        <div class="player-icon" style="width: 28px; height: 28px; font-size: 12px;"><i class="fa-solid fa-user"></i></div>
+                        Oussama Sokhane
+                    </div>
+                    <ul class="notif-details">
+                        <li>
+                            <i class="fa-solid fa-file-signature"></i> 
+                            <span><strong>FUS Rabat</strong> : Renouvellement de contrat</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-file-contract"></i> 
+                            <span><strong>RSB Berkane</strong> : Proposition de contrat</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- ================= FIN NOTIFICATION ================= -->
+
+            <!-- Statistiques -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-value">32</span>
+                    <span class="stat-label">Transactions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">17</span>
+                    <span class="stat-label">Joueurs Actifs</span>
+                </div>
+            </div>
+
+            <!-- Titre & Barre de recherche -->
+            <div class="section-title">Transactions Réussies</div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Chercher un joueur ou un club..." onkeyup="filterCards()">
+            </div>
+
+            <!-- Liste complète des cartes joueurs du Dashboard -->
+            <div id="playersList">
+
+                <!-- Mohamed Souboul -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Mohamed Souboul</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>JS Soualem</span>
+                            </div>
+                            <div class="transfer-date">2022 - 2023</div>
+                        </div>
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>SC Bastia (FRA)</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>SC Bastia</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Ajman Club (UAE)</span>
+                            </div>
+                            <div class="transfer-date">2024 - 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anass Benhamida -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Anass Benhamida</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA (Espoirs)</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Raja CA Pro</span>
+                            </div>
+                            <div class="transfer-date">2022 - 2023</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reda Moussadek -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Reda Moussadek</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Chabab Mohammedia</span>
+                            </div>
+                            <div class="transfer-date">2024 - 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amir El Haddaoui -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Amir El Haddaoui</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>JS Soualem</span>
+                            </div>
+                            <div class="transfer-date">2022 - 2023</div>
+                        </div>
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>JS Soualem</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Raja CA</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Taha Alachbili -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Taha Alachbili</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA (Youth)</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Wydad Fès</span>
+                            </div>
+                            <div class="transfer-date">2024 - 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hamza Bouskal -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Hamza Bouskal</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA (Espoirs)</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Union Touarga</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hamza Ait Allal -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Hamza Ait Allal</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Wydad AC</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Chabab Mohammedia</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Chabab Mohammedia</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Slavia Sofia (BUL)</span>
+                            </div>
+                            <div class="transfer-date">2024 - 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riad Idbouiguiguine -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Riad Idbouiguiguine</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>JS Soualem</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adham Elkhalfy -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Adham Elkhalfy</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA (Youth)</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Chabab Atlas Khénifra</span>
+                            </div>
+                            <div class="transfer-date">2025 - 2026</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zaid Dkioukien -->
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-identity">
+                            <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="player-name">Zaid Dkioukien</div>
+                        </div>
+                        <div class="status-badge"><i class="fa-solid fa-check"></i> Actif</div>
+                    </div>
+                    <div class="transfer-timeline">
+                        <div class="transfer-item">
+                            <div class="transfer-path">
+                                <span>Raja CA (Espoirs)</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Chabab Mohammedia</span>
+                            </div>
+                            <div class="transfer-date">2023 - 2024</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= PAGE 2: JOUEURS ================= -->
+        <div id="joueursPage" class="page-view">
+            <div class="section-title">Liste des Joueurs</div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Mohamed Souboul</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 23 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Ajman Club</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Anass Benhamida</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 22 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Raja CA</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Reda Moussadek</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 23 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Chabab Mohammedia</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Amir El Haddaoui</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 25 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Raja CA</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Taha Alachbili</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 22 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Wydad Fès</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Hamza Bouskal</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 23 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Union Touarga</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Hamza Ait Allal</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 24 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Slavia Sofia</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Riad Idbouiguiguine</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 23 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">JS Soualem</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Adham Elkhalfy</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 21 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">CA Khénifra</div>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <div class="player-identity">
+                        <div class="player-icon"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div class="player-name">Zaid Dkioukien</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Âge : 22 ans</div>
+                        </div>
+                    </div>
+                    <div class="club-tag">Chabab Mohammedia</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE 3: TRANSFERTS ================= -->
+        <div id="transfertsPage" class="page-view">
+            <div class="section-title">Transferts Récents vers Anciens</div>
+
+            <!-- 2025 - 2026 -->
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Adham Elkhalfy</span>
+                    <span class="transfer-season">2025 - 2026</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA (Youth) <i class="fa-solid fa-arrow-right"></i> Chabab Atlas Khénifra</span>
+                </div>
+            </div>
+
+            <!-- 2024 - 2025 -->
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Mohamed Souboul</span>
+                    <span class="transfer-season">2024 - 2025</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">SC Bastia <i class="fa-solid fa-arrow-right"></i> Ajman Club (UAE)</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Hamza Ait Allal</span>
+                    <span class="transfer-season">2024 - 2025</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Chabab Mohammedia <i class="fa-solid fa-arrow-right"></i> Slavia Sofia</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Reda Moussadek</span>
+                    <span class="transfer-season">2024 - 2025</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA <i class="fa-solid fa-arrow-right"></i> Chabab Mohammedia</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Taha Alachbili</span>
+                    <span class="transfer-season">2024 - 2025</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA (Youth) <i class="fa-solid fa-arrow-right"></i> Wydad Fès</span>
+                </div>
+            </div>
+
+            <!-- 2023 - 2024 -->
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Mohamed Souboul</span>
+                    <span class="transfer-season">2023 - 2024</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA <i class="fa-solid fa-arrow-right"></i> SC Bastia (FRA)</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Riad Idbouiguiguine</span>
+                    <span class="transfer-season">2023 - 2024</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA <i class="fa-solid fa-arrow-right"></i> JS Soualem</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Hamza Bouskal</span>
+                    <span class="transfer-season">2023 - 2024</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA (Espoirs) <i class="fa-solid fa-arrow-right"></i> Union Touarga</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Zaid Dkioukien</span>
+                    <span class="transfer-season">2023 - 2024</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA (Espoirs) <i class="fa-solid fa-arrow-right"></i> Chabab Mohammedia</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Amir El Haddaoui</span>
+                    <span class="transfer-season">2023 - 2024</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">JS Soualem <i class="fa-solid fa-arrow-right"></i> Raja CA</span>
+                </div>
+            </div>
+
+            <!-- 2022 - 2023 -->
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Mohamed Souboul</span>
+                    <span class="transfer-season">2022 - 2023</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA <i class="fa-solid fa-arrow-right"></i> JS Soualem</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Anass Benhamida</span>
+                    <span class="transfer-season">2022 - 2023</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA (Espoirs) <i class="fa-solid fa-arrow-right"></i> Raja CA Pro</span>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="card-header-flex">
+                    <span class="player-name">Amir El Haddaoui</span>
+                    <span class="transfer-season">2022 - 2023</span>
+                </div>
+                <div class="transfer-row">
+                    <span class="transfer-team">Raja CA <i class="fa-solid fa-arrow-right"></i> JS Soualem</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE 4: PROFIL ================= -->
+        <div id="profilPage" class="page-view">
+            <div class="section-title">Mon Profil Agent</div>
+
+            <div class="profile-header" style="flex-direction: column; text-align: center; gap: 10px;">
+                <div class="avatar" style="width: 80px; height: 80px; font-size: 28px;">SA</div>
+                <div class="profile-info">
+                    <h1 style="font-size: 20px;">Saber Aballagh</h1>
+                    <p>Agent de Joueurs de Football</p>
+                </div>
+            </div>
+
+            <div class="data-card">
+                <div class="info-list">
+                    <div class="info-item">
+                        <span>Nom Complet</span>
+                        <span>Saber Aballagh</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Nationalité</span>
+                        <span>Marocaine</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Licence FIFA ID</span>
+                        <span>Ma32009</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Statut Accréditation</span>
+                        <span style="color: var(--accent-green);">Valide / Officiel</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Joueurs Actifs</span>
+                        <span>17</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation du bas Mobile -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('dashboardPage', this)">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('joueursPage', this)">
+            <i class="fa-solid fa-users"></i>
+            <span>Joueurs</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('transfertsPage', this)">
+            <i class="fa-solid fa-right-left"></i>
+            <span>Transferts</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('profilPage', this)">
+            <i class="fa-solid fa-id-card"></i>
+            <span>Profil</span>
+        </button>
+    </nav>
+
+    <script>
+        function filterCards() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const cards = document.querySelectorAll("#playersList .player-card");
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function switchTab(pageId, btnElement) {
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(page => page.classList.remove('active'));
+
+            document.getElementById(pageId).classList.add('active');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
